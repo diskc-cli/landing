@@ -395,6 +395,22 @@
     .command-row code { color: var(--green); font-size: 12.5px; }
     .command-row span { color: #9caeb5; font-size: 12.5px; }
 
+    .quick-checks { padding: 22px; }
+    .quick-checks-head { display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:16px; }
+    .quick-checks h3 { margin:0; font-size:17px; }
+    .quick-checks-head p { margin:0; color:var(--muted); font-size:12.5px; }
+    .quick-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    .quick-check {
+      min-width:0;
+      padding:15px;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:11px;
+      background:rgba(5,10,14,.48);
+    }
+    .quick-check strong { display:block; margin-bottom:6px; font-size:13px; }
+    .quick-check code { display:block; overflow:auto; color:var(--mint); font-size:11.5px; white-space:nowrap; }
+    .quick-check p { margin:8px 0 0; color:#97a8b0; font-size:12px; line-height:1.45; }
+
     /* Install */
     .install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .install { padding: 23px; }
@@ -419,8 +435,9 @@
       padding: 13px;
       margin: 13px 0;
     }
-    .copyline code { color: #ebf0f1; overflow:auto; white-space:nowrap; font-size: 12px; }
+    .copyline code { min-width:0; color: #ebf0f1; overflow:auto; white-space:nowrap; font-size: 12px; }
     .copybtn {
+      flex:0 0 auto;
       margin-left: auto;
       border: 0;
       background: transparent;
@@ -450,14 +467,21 @@
     footer {
       margin-top: 34px;
       border-top: 1px solid var(--line);
-      padding: 32px 0 42px;
+      padding: 42px 0 46px;
+      background:linear-gradient(180deg, rgba(14,22,28,.36), rgba(7,11,15,.12));
       color: #84959e;
       font-size: 12px;
     }
-    .footer-grid { display:grid; grid-template-columns:1fr auto; gap:25px; align-items:center; }
-    .footer-links { display:flex; gap:19px; flex-wrap:wrap; justify-content:flex-end; }
+    .footer-grid { display:grid; grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(150px,.55fr)); gap:34px; align-items:start; }
+    .footer-brand { max-width:460px; }
+    .footer-kicker { margin:12px 0 0; color:var(--mint); font:800 10px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; }
+    .footer-group { display:grid; align-content:start; gap:10px; }
+    .footer-label { color:var(--muted-2); font:800 10px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; }
+    .footer-links { display:grid; gap:9px; }
+    .footer-links a { width:max-content; max-width:100%; color:#b3c0c5; }
     .footer-links a:hover { color:var(--green); }
-    .legal-note { max-width:700px; margin-top:10px; color:#71818a; font-size:11px; }
+    .legal-note { margin:15px 0 0; color:#84959e; font-size:11.5px; line-height:1.6; }
+    .footer-location { margin:11px 0 0; color:var(--muted-2); font-size:11px; }
 
     @media (max-width: 980px) {
       .nav-links { display:none; }
@@ -465,6 +489,7 @@
       .hero { padding-top:50px; }
       .step-grid { grid-template-columns: repeat(3,1fr); }
       .use-grid, .safety-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns:minmax(0,1fr) repeat(2,minmax(130px,.55fr)); gap:24px; }
     }
     @media (max-width: 680px) {
       .wrap { width:min(100% - 24px,1180px); }
@@ -477,10 +502,20 @@
       .terminal-body { font-size:10.6px; padding:15px; }
       .workflow-grid { grid-template-columns:1fr; }
       .big-arrow { transform:rotate(90deg); }
-      .step-grid, .use-grid, .safety-grid, .install-grid { grid-template-columns:1fr; }
+      .step-grid, .use-grid, .safety-grid, .install-grid, .quick-grid { grid-template-columns:1fr; }
+      .quick-checks-head { display:block; }
+      .quick-checks-head p { margin-top:5px; }
       .command-row { grid-template-columns:1fr; gap:5px; }
+      .status { flex-wrap:wrap; }
       .footer-grid { grid-template-columns:1fr; }
-      .footer-links { justify-content:flex-start; }
+      .footer-group { gap:9px; }
+    }
+    @media (max-width: 360px) {
+      section { padding:36px 0; }
+      h1 { font-size:clamp(42px, 15vw, 51px); }
+      .hero-actions { display:grid; grid-template-columns:1fr; }
+      .hero-actions .btn { width:100%; }
+      .footer-links { gap:12px 16px; }
     }
   </style>
 </head>
@@ -496,6 +531,7 @@
         <a href="#why">Why</a>
         <a href="#how">How it works</a>
         <a href="#usage">Usage</a>
+        <a href="#quick-checks">Quick checks</a>
         <a href="#install">Install</a>
         <a href="#safety">Safety</a>
       </div>
@@ -689,13 +725,13 @@ disk full in ~35 min</pre></div>
     <section id="usage">
       <div class="wrap">
         <h2 class="section-title">Simple commands. <span>No command maze.</span></h2>
-        <p class="section-intro">The CLI is intentionally small. Start broad, or point diskc at the exact filesystem, directory, or file you care about.</p>
+        <p class="section-intro">Start broad, target one or more paths, or inspect every physical mount. diskc accepts paths before or after flags and samples growth for three seconds by default.</p>
         <div class="usage-grid">
           <div class="card commands">
-            <div class="command-row"><code>diskc</code><span>Investigate disk pressure across the machine and surface the most suspicious consumers.</span></div>
-            <div class="command-row"><code>diskc /var</code><span>Investigate one filesystem or subtree.</span></div>
-            <div class="command-row"><code>diskc /var/log</code><span>Rank large logs, measure growth, and map active writers.</span></div>
-            <div class="command-row"><code>diskc /var/log/app.log</code><span>Inspect one file: size, growth rate, and any discovered writer context.</span></div>
+            <div class="command-row"><code>diskc</code><span>Investigate <code>/</code>: pressure, inodes, large files/directories, growth, and writable processes.</span></div>
+            <div class="command-row"><code>diskc /var</code><span>Inspect one filesystem, directory, or a single file.</span></div>
+            <div class="command-row"><code>diskc / /data /backup</code><span>Inspect several paths independently; results are never mixed across filesystems.</span></div>
+            <div class="command-row"><code>diskc --all</code><span>Discover and inspect all mounted physical filesystems, excluding virtual mounts.</span></div>
           </div>
 
           <div class="terminal">
@@ -712,24 +748,64 @@ Trend: <span class="warn">+2.4 GB/hour</span>
 Estimated filesystem full: <span class="hot">~35 minutes</span>
 
 Largest files
-────────────────────────────────────
-payment/app.log      74.8 GB  (log)  <span class="hot">↑ 18.2 MB/s</span>  [1 writer(s)]
-nginx/access.log     31.6 GB  (log)  <span class="warn">↑ 4.1 MB/s</span>
-app/archive          18.1 GB  (file)
+   74.8 GB  /var/log/payment/app.log  (log)  <span class="hot">↑ 18.2 MB/s</span>  [1 writer(s)]
+   31.6 GB  /var/log/nginx/access.log  (log)  <span class="warn">↑ 4.1 MB/s</span>
+   18.1 GB  /var/log/app/archive  (file)
 
 Active writers
-────────────────────────────────────
 /var/log/payment/app.log
 └─ PID 21819  payment-api
    ├─ exe      /opt/payment/bin/payment-api
    └─ service  payment.service
 
 Potential issues
-────────────────────────────────────
-<span class="hot">payment/app.log</span>
+<span class="hot">/var/log/payment/app.log</span>
 ├─ rapid growth: 65.5 GB/hour
 └─ filesystem full in ~35 min</pre>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quick-checks">
+      <div class="wrap">
+        <div class="card quick-checks">
+          <div class="quick-checks-head">
+            <h2 class="section-title">SRE quick checks for <span>live incidents.</span></h2>
+            <p>All commands are read-only. Use <code>Ctrl-C</code> to stop watch mode.</p>
+          </div>
+          <div class="quick-grid">
+            <article class="quick-check">
+              <strong>Fast size and inode triage</strong>
+              <code>diskc /var --sample 0</code>
+              <p>Skip the growth wait when you need the largest files and inode pressure immediately.</p>
+            </article>
+            <article class="quick-check">
+              <strong>Find the file growing now</strong>
+              <code>diskc /var --top 50 --depth 6 --sample 5s</code>
+              <p>Use a deeper scan and longer sample to rank high-growth candidates with writer context.</p>
+            </article>
+            <article class="quick-check">
+              <strong>Resolve df versus du</strong>
+              <code>diskc --deleted --sample 0</code>
+              <p>Find deleted-but-open files that retain blocks after their directory entries disappear.</p>
+            </article>
+            <article class="quick-check">
+              <strong>Sweep every physical mount</strong>
+              <code>diskc --all --top 20 --sample 5s</code>
+              <p>Check attached data volumes without walking virtual filesystems such as <code>/proc</code> and tmpfs.</p>
+            </article>
+            <article class="quick-check">
+              <strong>Watch an active incident</strong>
+              <code>diskc --watch --interval 5s /data</code>
+              <p>Refresh the report continuously to see the same evidence change as pressure builds.</p>
+            </article>
+            <article class="quick-check">
+              <strong>Export evidence for automation</strong>
+              <code>diskc /data --top 50 --sample 3s --deleted --json</code>
+              <p>Emit machine-readable output for incident tooling; multi-path scans produce a JSON array.</p>
+            </article>
           </div>
         </div>
       </div>
@@ -791,9 +867,8 @@ Potential issues
 
         <div class="disclaimer" id="disclaimer">
           <strong>Disclaimer — use at your own risk.</strong>
-          <p>diskc and its related source code, binaries, documentation, examples, recommendations, and website content are provided on an <strong>“AS IS” and “AS AVAILABLE” basis, without warranties or guarantees of any kind</strong>, express or implied. To the maximum extent permitted by applicable law, the author(s), maintainers, contributors, and affiliated parties disclaim responsibility and liability for any loss, damage, data loss, corruption, downtime, outage, service interruption, security incident, lost profits, business interruption, or other direct, indirect, incidental, special, exemplary, consequential, or similar damages or results arising from or related to use of, inability to use, reliance on, modification of, or actions taken based on diskc.</p>
-          <p>You are solely responsible for understanding your system, validating diskc output, reviewing any command or operational action, maintaining backups, and determining whether an action is safe for your environment. No output, diagnosis, projection, classification, recommendation, example, or future AI-generated analysis should be treated as a guarantee of root cause, safety, or correctness. <strong>Do not delete, truncate, restart, kill, modify, or otherwise change production data or processes solely because diskc suggests that they may be related to disk usage.</strong></p>
-          <p>This website is informational and does not constitute legal, security, compliance, or professional advice. Any license published in the GitHub repository governs the source code and should be reviewed separately. This website disclaimer is not a substitute for a properly selected open-source license or legal review.</p>
+          <p>diskc is provided <strong>“AS IS” and “AS AVAILABLE,” without warranties or guarantees.</strong> You are responsible for validating its output, maintaining backups, and deciding whether any action is safe for your environment.</p>
+          <p><strong>Do not delete, truncate, restart, kill, or modify production data or processes solely because diskc identifies them.</strong> The project and this website are informational; use is at your own risk.</p>
         </div>
       </div>
     </section>
@@ -802,19 +877,33 @@ Potential issues
 
   <footer>
     <div class="wrap footer-grid">
-      <div>
+      <div class="footer-brand">
         <a href="#top" class="brand">
           <img src="assets/favicon-64.png" alt="" class="brand-icon">
           diskc
         </a>
-        <div class="legal-note">Early-stage SRE tooling for investigating disk pressure. Use responsibly and validate findings before taking production actions.</div>
+        <p class="footer-kicker">SRE-first disk investigation</p>
+        <p class="legal-note">Early-stage tooling for finding disk pressure fast. Validate findings before taking production actions.</p>
+        <p class="footer-location">Built with ❤️ in San Francisco.</p>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/diskc-cli/diskc" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://github.com/diskc-cli/diskc/issues" target="_blank" rel="noopener noreferrer">Issues</a>
-        <a href="https://github.com/diskc-cli/diskc/releases" target="_blank" rel="noopener noreferrer">Releases</a>
-        <a href="#disclaimer">Disclaimer</a>
-      </div>
+      <nav class="footer-group" aria-label="diskc links">
+        <span class="footer-label">diskc</span>
+        <div class="footer-links">
+          <a href="https://github.com/diskc-cli/diskc" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          <a href="https://github.com/diskc-cli/diskc/issues" target="_blank" rel="noopener noreferrer">Issues ↗</a>
+          <a href="https://github.com/diskc-cli/diskc/releases" target="_blank" rel="noopener noreferrer">Releases ↗</a>
+          <a href="#disclaimer">Disclaimer</a>
+        </div>
+      </nav>
+      <nav class="footer-group" aria-label="Ecosystem links">
+        <span class="footer-label">Ecosystem</span>
+        <div class="footer-links">
+          <a href="https://www.linuxfoundation.org/" target="_blank" rel="noopener noreferrer">Linux Foundation ↗</a>
+          <a href="https://www.mysql.com/" target="_blank" rel="noopener noreferrer">MySQL ↗</a>
+          <a href="https://www.postgresql.org/" target="_blank" rel="noopener noreferrer">PostgreSQL ↗</a>
+          <a href="https://kubernetes.io/" target="_blank" rel="noopener noreferrer">Kubernetes ↗</a>
+        </div>
+      </nav>
     </div>
   </footer>
 
