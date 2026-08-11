@@ -360,26 +360,47 @@
     .step p { margin: 0; color: #97a8b0; font-size: 12.5px; line-height: 1.48; }
     .step code { color: var(--mint); font-size: 11.5px; }
 
-    /* Use cases */
-    .use-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .use { padding: 20px; }
-    .use .tag {
-      font: 800 10px/1 var(--mono);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--green);
+    /* Interactive incident console */
+    .incident-console { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(285px,.7fr); gap:14px; align-items:stretch; }
+    .incident-terminal { min-width:0; overflow:hidden; }
+    .incident-command { padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.075); color:#edf2f3; font:12px/1.5 var(--mono); overflow:auto; white-space:nowrap; }
+    .incident-output { padding:15px; display:grid; gap:6px; }
+    .incident-output-label { margin:4px 4px 3px; color:#82949e; font:800 10px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; }
+    .incident-static { padding:5px 12px 8px; color:#b5c2c7; font:12px/1.6 var(--mono); }
+    .incident-line {
+      width:100%;
+      border:1px solid transparent;
+      border-radius:9px;
+      padding:11px 12px;
+      background:transparent;
+      color:#c6d1d5;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:12px;
+      align-items:center;
+      text-align:left;
+      cursor:pointer;
+      font:12px/1.4 var(--mono);
+      transition:background .16s ease, border-color .16s ease, transform .16s ease;
     }
-    .use h3 { font-size: 16px; margin: 9px 0 5px; }
-    .use p { color: #9cadb5; font-size: 13px; margin: 0; }
-    .mini {
-      font: 11.5px/1.55 var(--mono);
-      margin-top: 14px;
-      background: #080d11;
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 9px;
-      padding: 12px;
-      color: #b3c0c5;
+    .incident-line:hover, .incident-line:focus-visible, .incident-line.is-active {
+      outline:0;
+      border-color:rgba(242,140,40,.44);
+      background:rgba(242,140,40,.075);
     }
+    .incident-line:hover { transform:translateX(2px); }
+    .incident-line.is-active .line-path { color:var(--mint); }
+    .line-path { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .line-metric { color:var(--yellow); white-space:nowrap; }
+    .line-metric.hot { color:var(--red); }
+    .incident-insight { padding:22px; display:flex; flex-direction:column; justify-content:space-between; }
+    .insight-eyebrow { margin:0 0 10px; color:var(--green); font:800 10px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; }
+    .incident-insight h3 { margin:0; font-size:22px; line-height:1.08; letter-spacing:-.035em; }
+    .incident-insight p { margin:12px 0 0; color:#a5b4ba; font-size:13px; line-height:1.55; }
+    .insight-divider { height:1px; margin:20px 0 14px; background:var(--line); }
+    .insight-value { color:#dce5e8; font:12px/1.55 var(--mono); }
+    .insight-value strong { color:var(--mint); }
+    .incident-hint { margin:18px 0 0; color:#71848e; font-size:11.5px; }
 
     /* Usage */
     .usage-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 18px; align-items: stretch; }
@@ -488,7 +509,8 @@
       .hero-grid, .usage-grid { grid-template-columns:1fr; }
       .hero { padding-top:50px; }
       .step-grid { grid-template-columns: repeat(3,1fr); }
-      .use-grid, .safety-grid { grid-template-columns: repeat(2,1fr); }
+      .incident-console { grid-template-columns:1fr; }
+      .safety-grid { grid-template-columns: repeat(2,1fr); }
       .footer-grid { grid-template-columns:minmax(0,1fr) repeat(2,minmax(130px,.55fr)); gap:24px; }
     }
     @media (max-width: 680px) {
@@ -502,10 +524,12 @@
       .terminal-body { font-size:10.6px; padding:15px; }
       .workflow-grid { grid-template-columns:1fr; }
       .big-arrow { transform:rotate(90deg); }
-      .step-grid, .use-grid, .safety-grid, .install-grid, .quick-grid { grid-template-columns:1fr; }
+      .step-grid, .safety-grid, .install-grid, .quick-grid { grid-template-columns:1fr; }
       .quick-checks-head { display:block; }
       .quick-checks-head p { margin-top:5px; }
       .command-row { grid-template-columns:1fr; gap:5px; }
+      .incident-line { grid-template-columns:1fr; gap:4px; }
+      .incident-insight { padding:19px; }
       .status { flex-wrap:wrap; }
       .footer-grid { grid-template-columns:1fr; }
       .footer-group { gap:9px; }
@@ -678,46 +702,56 @@ disk full in ~35 min</pre></div>
       </div>
     </section>
 
-    <section>
+    <section id="incidents">
       <div class="wrap">
         <h2 class="section-title">Built for the disk failures <span>SREs actually see.</span></h2>
-        <div class="use-grid">
-          <article class="card use">
-            <div class="tag">Log storm</div>
-            <h3>One log is eating the filesystem</h3>
-            <p>See current size, growth velocity, owning process, and projected time to full.</p>
-            <div class="mini"><span class="path">app.log</span> 74.8G<br><span class="hot">↑ 18.2 MB/s</span><br>PID 21819 payment-api</div>
-          </article>
-          <article class="card use">
-            <div class="tag">Deleted-open</div>
-            <h3><code>rm</code> ran, but disk space did not return</h3>
-            <p>Detect unlinked files still held open by a process and show who retains the blocks.</p>
-            <div class="mini">38.2G retained<br>PID 3021 java<br><span class="warn">app-old.log (deleted)</span></div>
-          </article>
-          <article class="card use">
-            <div class="tag">Temporary files</div>
-            <h3><code>/tmp</code> is quietly exploding</h3>
-            <p>Prioritize large or rapidly growing temporary data and identify active writers.</p>
-            <div class="mini"><span class="path">/tmp/upload-883120.bin</span><br>42.1G · <span class="hot">↑ 11.8 MB/s</span></div>
-          </article>
-          <article class="card use">
-            <div class="tag">Inodes</div>
-            <h3>Plenty of GB free, but writes still fail</h3>
-            <p>Highlight inode exhaustion as a first-class disk pressure signal.</p>
-            <div class="mini">bytes used 48%<br>inode used <span class="hot">100%</span><br>likely many small files</div>
-          </article>
-          <article class="card use">
-            <div class="tag">Core dumps & caches</div>
-            <h3>Large non-binary data in unexpected places</h3>
-            <p>Classify core dumps, archives, caches, logs, and temporary files so likely culprits rise first.</p>
-            <div class="mini">core.29311 28.4G<br>cache.data 19.2G<br>archive.tar 11.1G</div>
-          </article>
-          <article class="card use">
-            <div class="tag">Rotation</div>
-            <h3>Large logs need attention</h3>
-            <p>Classify oversized logs, then prioritize the ones growing quickly or held open by active writers.</p>
-            <div class="mini">app.log 74.8G<br><span class="hot">↑ 18.2 MB/s</span><br>PID 21819 payment-api</div>
-          </article>
+        <p class="section-intro">Run one investigation, then hover—or tab—to each signal. diskc connects the evidence you need before switching between filesystem, process, and storage tools.</p>
+        <div class="incident-console">
+          <div class="terminal incident-terminal" aria-label="Interactive diskc incident output">
+            <div class="terminal-head">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="terminal-title">interactive incident output</span>
+            </div>
+            <div class="incident-command"><span class="prompt">$</span> diskc</div>
+            <div class="incident-output">
+              <div class="incident-output-label">Hover a signal to inspect it</div>
+              <button class="incident-line is-active" type="button" aria-pressed="true" data-eyebrow="Pressure summary" data-title="Start with capacity, inodes, and time-to-full." data-copy="diskc puts the filesystem's immediate risk in one place: byte pressure, inode pressure, observed growth, and a projected deadline." data-evidence="<strong>What it replaces:</strong> running df -h, df -i, and separate calculations before you know how urgent the incident is.">
+                <span class="line-path">Disk pressure: <span class="warn">WARNING</span>  92.4% used (38.0 GB free)<br>Inodes: 41.0% used  |  /<br>Trend: <span class="warn">+2.4 GB/hour</span><br>Estimated filesystem full: <span class="hot">~35 minutes</span></span>
+              </button>
+              <div class="incident-output-label">Largest files</div>
+              <button class="incident-line" type="button" aria-pressed="false" data-eyebrow="Rapid log growth" data-title="The urgent file is not always the biggest." data-copy="diskc ranks the observed growth beside file size, then resolves the writer process and projected time to full for the log that is actually driving the incident." data-evidence="<strong>What it replaces:</strong> repeating du, find, lsof, and ps while the file keeps growing.">
+                <span class="line-path">74.8 GB  /var/log/payment/app.log  (log)</span><span class="line-metric hot">↑ 18.2 MB/s · [1 writer(s)]</span>
+              </button>
+              <button class="incident-line" type="button" aria-pressed="false" data-eyebrow="Fast-growing temporary data" data-title="Size alone does not tell you what will fill next." data-copy="diskc ranks fast growth alongside large files, so a rapidly expanding temporary upload is visible before it becomes the largest consumer." data-evidence="<strong>What it replaces:</strong> rerunning du and find to catch a file that changed after the first scan.">
+                <span class="line-path">42.1 GB  /tmp/upload-883120.bin  (temporary/cache)</span><span class="line-metric hot">↑ 11.8 MB/s</span>
+              </button>
+              <button class="incident-line" type="button" aria-pressed="false" data-eyebrow="Fast-growing access log" data-title="Compare active growth across the real candidates." data-copy="diskc keeps the growth rate next to each file, so a secondary log stream is visible without another manual sample cycle." data-evidence="<strong>What it replaces:</strong> checking every likely log path one by one after a broad du scan.">
+                <span class="line-path">31.6 GB  /var/log/nginx/access.log  (log)</span><span class="line-metric">↑ 4.1 MB/s</span>
+              </button>
+              <div class="incident-output-label">Largest directories</div>
+              <div class="incident-static">128.4 GB  <span class="path">/var/log</span><br> 67.2 GB  <span class="path">/tmp</span></div>
+              <div class="incident-output-label">Active writers</div>
+              <button class="incident-line" type="button" aria-pressed="false" data-eyebrow="Writer attribution" data-title="Move from the file to the process responsible." data-copy="diskc maps a suspicious writable file to its PID, executable, and systemd service when that context is available." data-evidence="<strong>What it replaces:</strong> manually joining file paths, lsof output, ps, and service metadata.">
+                <span class="line-path">/var/log/payment/app.log<br>└─ PID 21819  payment-api<br>&nbsp;&nbsp; ├─ exe  /opt/payment/bin/payment-api<br>&nbsp;&nbsp; └─ service  payment.service</span>
+              </button>
+              <div class="incident-output-label">Potential issues</div>
+              <button class="incident-line" type="button" aria-pressed="false" data-eyebrow="Projected disk full" data-title="Turn a log spike into an actionable deadline." data-copy="diskc connects the observed rate to remaining filesystem capacity, so the report explains both the likely cause and the urgency of response." data-evidence="<strong>What it replaces:</strong> hand-calculating growth projections after identifying a suspicious file.">
+                <span class="line-path"><span class="hot">/var/log/payment/app.log</span><br>├─ rapid growth: 65.5 GB/hour<br>└─ filesystem full in <span class="hot">~35 minutes</span></span>
+              </button>
+            </div>
+          </div>
+          <aside class="card incident-insight" aria-live="polite">
+            <div>
+              <p class="insight-eyebrow" id="insightEyebrow">Pressure summary</p>
+              <h3 id="insightTitle">Start with capacity, inodes, and time-to-full.</h3>
+              <p id="insightCopy">diskc puts the filesystem's immediate risk in one place: byte pressure, inode pressure, observed growth, and a projected deadline.</p>
+            </div>
+            <div>
+              <div class="insight-divider"></div>
+              <div class="insight-value" id="insightEvidence"><strong>What it replaces:</strong> running df -h, df -i, and separate calculations before you know how urgent the incident is.</div>
+              <p class="incident-hint">Move across the report lines or use <code>Tab</code> to inspect each investigation shortcut.</p>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -929,6 +963,30 @@ Potential issues
         setTimeout(() => button.textContent = "COPY", 1800);
       }
     }
+
+    const incidentLines = document.querySelectorAll(".incident-line");
+    const insightEyebrow = document.getElementById("insightEyebrow");
+    const insightTitle = document.getElementById("insightTitle");
+    const insightCopy = document.getElementById("insightCopy");
+    const insightEvidence = document.getElementById("insightEvidence");
+
+    function setIncidentInsight(line) {
+      incidentLines.forEach((item) => {
+        const active = item === line;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      insightEyebrow.textContent = line.dataset.eyebrow;
+      insightTitle.textContent = line.dataset.title;
+      insightCopy.textContent = line.dataset.copy;
+      insightEvidence.innerHTML = line.dataset.evidence;
+    }
+
+    incidentLines.forEach((line) => {
+      line.addEventListener("mouseenter", () => setIncidentInsight(line));
+      line.addEventListener("focus", () => setIncidentInsight(line));
+      line.addEventListener("click", () => setIncidentInsight(line));
+    });
   </script>
 </body>
 </html>
