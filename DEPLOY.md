@@ -1,7 +1,7 @@
 # diskc landing page
 
 This folder is a static, dependency-free landing page for:
-https://github.com/diskc-cli/diskc
+https://github.com/debugc-clis/diskc
 
 ## Before production deployment
 

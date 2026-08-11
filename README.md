@@ -1,6 +1,6 @@
 # diskc landing page
 
-A dependency-free, static landing page for [diskc](https://github.com/diskc-cli/diskc), the Linux CLI for investigating disk pressure.
+A dependency-free, static landing page for [diskc](https://github.com/debugc-clis/diskc), the Linux CLI for investigating disk pressure.
 
 ## Local preview
 
